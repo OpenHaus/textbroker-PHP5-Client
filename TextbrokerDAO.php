@@ -46,7 +46,7 @@
  * require_once 'TextbrokerBudgetOrderDAO.php';
  * $budgetOrder = TextbrokerBudgetOrderDAO::singleton();
  * $aCategories = $budgetOrder->getCategories();
- * $aStatus     = $budgetOrder->getStatus();
+ * $aStatus     = $budgetOrder->getStatus($budgetOrderId);
  * </code>
  *
  * @package textbroker-PHP5-Client
@@ -103,13 +103,13 @@ class TextbrokerDAO {
      *
      * @return object
      */
-    public static function &singleton() {
+    public static function &singleton($budgetKey = null, $budgetId = null, $password = null) {
 
         static $instance;
 
         if (!isset($instance)) {
             $class      = get_called_class();
-            $instance   = new $class;
+            $instance   = new $class($budgetKey, $budgetId, $password);
         }
 
         return $instance;

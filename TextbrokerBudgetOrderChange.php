@@ -36,7 +36,7 @@
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
 
-require_once(dirname(__FILE__) . '/TextbrokerDAO.php');
+require_once(dirname(__FILE__) . '/Textbroker.php');
 
 /**
  * BudgetOrderChangeService
@@ -52,7 +52,7 @@ require_once(dirname(__FILE__) . '/TextbrokerDAO.php');
  * @package textbroker-PHP5-Client
  * @author Fabio Bacigalupo <info1@open-haus.de>
  */
-class TextbrokerBudgetOrderChangeDAO extends TextbrokerDAO {
+class TextbrokerBudgetOrderChange extends Textbroker {
 
     /**
      *

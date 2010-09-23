@@ -31,126 +31,90 @@
 // +---------------------------------------------------------------------------+
 // | textbroker-PHP5-Client 0.1                                                |
 // +---------------------------------------------------------------------------+
-// | TextbrokerDAO.php                                                         |
+// | TextbrokerBudgetCheckDAO.php                                              |
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
 
+require_once(dirname(__FILE__) . '/Textbroker.php');
+
 /**
- * Wrapper for Textbroker API
+ * BudgetCheckService
  *
- * Description for classes and methods (parameter, return values) is taken from "Textbroker API-Dokumentation".
- *
- * Usage:
- * <code>
- * require_once 'TextbrokerBudgetOrderDAO.php';
- * $budgetOrder = TextbrokerBudgetOrderDAO::singleton();
- * $aCategories = $budgetOrder->getCategories();
- * $aStatus     = $budgetOrder->getStatus($budgetOrderId);
- * </code>
+ * Budgetinformationen abfragen
  *
  * @package textbroker-PHP5-Client
  * @author Fabio Bacigalupo <info1@open-haus.de>
- * @since PHP 5.3
  */
-class TextbrokerDAO {
+class TextbrokerBudgetCheck extends Textbroker {
 
-    const BUDGET_URI    = 'https://api.textbroker.de/Budget/';
-    const BUDGET_ID     = 0; # Set this or pass in constructor
-    const BUDGET_KEY    = ''; # Set this or pass in constructor
-    const PASSWORD      = ''; # Set this or pass in constructor
-
-    private $aOptions;
-
-    protected $budgetId;
-    protected $budgetKey;
-    protected $salt;
-    protected $hash;
-
-    /**
-     * If you use multiple budgets you want to pass settings in constructor
-     * rather than statically defining it above as constant
-     *
-     * @param string $budgetKey Budget key as shown in "Budget Login information" in textbroker API backend
-     * @param int $budgetId Budget ID as shown in "Budget Login information" in textbroker API backend
-     * @param string $password Password as defined in textbroker API backend
-     */
     function __construct($budgetKey = null, $budgetId = null, $password = null) {
 
-        if (!is_null($budgetKey)) {
-            $this->budgetKey    = $budgetKey;
-        } else {
-            $this->budgetKey    = self::BUDGET_KEY;
-        }
-
-        if (!is_null($budgetId)) {
-            $this->budgetId     = $budgetId;
-        } else {
-            $this->budgetId     = self::BUDGET_ID;
-        }
-
-        if (is_null($password)) {
-            $password           = self::PASSWORD;
-        }
-
-        $this->salt = rand(0, 10000);
-        $this->hash = md5($this->salt . $password);
-        $this->login();
-    }
-
-    /**
-     * Singleton
-     *
-     * @return object
-     */
-    public static function &singleton($budgetKey = null, $budgetId = null, $password = null) {
-
-        static $instance;
-
-        if (!isset($instance)) {
-            $class      = get_called_class();
-            $instance   = new $class($budgetKey, $budgetId, $password);
-        }
-
-        return $instance;
-    }
-
-    /**
-     * Login to textbroker service
-     *
-     * @throws Exception
-     */
-    private function login() {
-
+        parent::__construct($budgetKey, $budgetId, $password);
         $this->setOptions(array(
-            'location'      => 'https://api.textbroker.de/Budget/loginService.php',
+            'location'      => 'https://api.textbroker.de/Budget/budgetCheckService.php',
             'uri'           => self::BUDGET_URI,
         ));
-
-        if (!$this->getClient()->doLogin($this->salt, $this->hash, $this->budgetKey)) {
-            throw new Exception('Could not login');
-        }
     }
 
     /**
-     * Open a new connection
+     * Die aktuelle Belastung des Budgets als Array-Element "usage"
+     * in Form einer Zahl mit 2 Stellen hinter dem Komma.
+     * Betrifft nur die bereits abgerechneten BudgetOrders.
+     * (Kein "sandbox"-Element im Testmodus)
      *
-     * @param array $aOptions
-     * @return object SoapClient
+     * @throws SoapFault
+     * @return array
      */
-    protected function getClient() {
+    public function getUsage() {
 
-        return new SoapClient(null, $this->aOptions);
+        return $this->getClient()->getUsage($this->salt, $this->hash, $this->budgetKey);
     }
 
     /**
-     * Set options which are passed to SoapClient
+     * Gibt Auskunft, ob das Budget im Testmodus betrieben wird
      *
-     * @param array $aOptions
+     * @throws SoapFault
+     * @return array (Array-Element "sandbox" = 1)
      */
-    protected function setOptions(array $aOptions) {
+    public function isInSandbox() {
 
-        $this->aOptions = $aOptions;
+        return $this->getClient()->isInSandbox($this->salt, $this->hash, $this->budgetKey);
+    }
+
+    /**
+     * Gibt den im Kunden-Interface eingegebenen Namen zurück
+     *
+     * @throws SoapFault
+     * @return string
+     */
+    public function getName() {
+
+        return $this->getClient()->getName($this->salt, $this->hash, $this->budgetKey);
+    }
+
+    /**
+     * getActualPeriodData – Gibt genauere Auskunft über die Laufzeit
+     * und die Nutzungswerte des Budgets. (Kein "sandbox"-Element im Testmodus.)
+     *
+     * Zurückgegeben wird ein Array mit folgenden Elementen:
+     * start – Startzeit als Unix-Zeitstempel (integer)
+     * end – Ende der BudgetPeriod als Unix-Zeitstempel (integer)
+     * left – Verfügbarer Betrag im Budget (float)
+     * locked – Der maximale Betrag, der von diesem Budget abgebucht wird, wenn alle
+     * Aufträge fertig sind (float)
+     * max – Der definierte Maximalbetrag für dieses Budget (float)
+     * name – Der im Kunden-Interface eingegebene Name (nur bei getName)
+     *
+     * Ist ein Budget ohne Limits, wird start und stop gleich 0 sein, 'left' ist kleiner
+     * oder gleich 0 und 'max' gleich 0
+     *
+     * @throws SoapFault
+     * @return array
+     */
+    public function getActualPeriodData() {
+
+        return $this->getClient()->getActualPeriodData($this->salt, $this->hash, $this->budgetKey);
     }
 }
 ?>

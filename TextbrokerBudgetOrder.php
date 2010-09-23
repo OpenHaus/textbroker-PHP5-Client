@@ -97,11 +97,17 @@ class TextbrokerBudgetOrder extends Textbroker {
      * @param int $rating Einstufung – Qualitätsstufe zwischen 2 und 5 (inklusive).
      * @param int $dueDays Bearbeitungszeit [optional] – eine Zahl zwischen 1 und 10 (Tage), wird es nicht angegeben, wird 1 Tag als gewünschter Wert angenommen.
      * @return array
-
+     * @throws TextbrokerBudgetOrderException
      */
     public function create($categoryId, $title, $description, $minLength = 350, $maxLength = 400, $rating = 4, $dueDays = 1) {
 
-        return $this->getClient()->create($this->salt, $this->hash, $this->budgetKey, $categoryId, $title, $description, $minLength, $maxLength, $rating, $dueDays);
+        $result = $this->getClient()->create($this->salt, $this->hash, $this->budgetKey, $categoryId, $title, $description, $minLength, $maxLength, $rating, $dueDays);
+
+        if (isset($result['error']) && empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
     }
 
     /**
@@ -266,6 +272,14 @@ class TextbrokerBudgetOrder extends Textbroker {
     public function reject($budgetOrderId) {
 
         return $this->getClient()->reject($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+    }
+}
+
+class TextbrokerBudgetOrderException extends TextbrokerException {
+
+    function __construct() {
+
+        parent::__construct();
     }
 }
 ?>

@@ -55,10 +55,79 @@
  */
 class Textbroker {
 
-    const BUDGET_URI    = 'https://api.textbroker.de/Budget/';
-    const BUDGET_ID     = 0; # Set this or pass in constructor
-    const BUDGET_KEY    = ''; # Set this or pass in constructor
-    const PASSWORD      = ''; # Set this or pass in constructor
+    const BUDGET_URI                    = 'https://api.textbroker.de/Budget/';
+    const BUDGET_ID                     = 0; # Set this or pass in constructor
+    const BUDGET_KEY                    = ''; # Set this or pass in constructor
+    const PASSWORD                      = ''; # Set this or pass in constructor
+
+    /**
+     * You have placed a BudgetOrder which has not been saved correctly.
+     * Please contact support.
+     */
+    const TB_STATUS_INTERNAL_ERROR      = 0;
+
+    /**
+     * Your BudgetOrder has been placed and saved correctly.
+     */
+    const TB_STATUS_PLACED              = 1;
+
+    /**
+     * Your BudgetOrder has been processed by Textbroker and is visible to authors.
+     */
+    const TB_STATUS_TB_ACCEPTED         = 2;
+
+    /**
+     * Your order is being written. With this status, a BudgetOrder can no longer be deleted.
+     */
+    const TB_STATUS_INWORK              = 3;
+
+    /**
+     * Text from the author has been completed and has passed through CopyScape.
+     * Your BudgetOrder is waiting to be reviewed. Ownership rights have not yet been transferred to the client.
+     * Notification of this status will be delivered to your CallbackURL.
+     * An OrderID that is identified as BudgetID with Status 4 is ready to be reviewed.
+     */
+    const TB_STATUS_READY               = 4;
+
+    /**
+     * Text has been accepted by the client. All ownership rights have been transferred;
+     * the final version of the text can be picked up.
+     *
+     * The callbackURL is used to set this status. An OrderID that is identified as
+     * BudgetID with Status 5 is ready to be picked up.
+     */
+    const TB_STATUS_ACCEPTED            = 5;
+
+    /**
+     * Text has been delivered (particularly important as a control function,
+     * so that you don’t pick up and use the same article twice)
+     */
+    const TB_STATUS_DELIVERED           = 6;
+
+    /**
+     * Client has deleted the BudgetOrder
+     * (this is possible as long as the order is not being written by an author).
+     */
+    const TB_STATUS_DELETED             = 7;
+
+    /**
+     * Textbroker has approved the rejection.
+     * From here you must decide whether you want to place the order again or delete it.
+     */
+    const TB_STATUS_REJECTION_GRANTED   = 8;
+
+    /**
+     * The order could not be released to the authors due to errors in the order description.
+     * In this case, you will need to revise your description before continuing.
+     */
+    const TB_STATUS_ORDER_REFUSED       = 9;
+
+    /**
+     * The BudgetOrder is waiting for actions from the client, the author, or Textbroker
+     *
+     * (Example: when a rejection is awaiting approval from Textbroker).
+     */
+    const TB_STATUS_WAITING             = 10;
 
     private $aOptions;
 
@@ -151,6 +220,14 @@ class Textbroker {
     protected function setOptions(array $aOptions) {
 
         $this->aOptions = $aOptions;
+    }
+}
+
+class TextbrokerException extends Exception {
+
+    function __construct() {
+
+        parent::__construct();
     }
 }
 ?>

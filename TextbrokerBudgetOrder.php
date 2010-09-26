@@ -74,20 +74,19 @@ class TextbrokerBudgetOrder extends Textbroker {
      */
     public function getCategories() {
 
-        $aCategory  = $this->getClient()->getCategories();
+        $result  = $this->getClient()->getCategories();
 
-        return $aCategory['categories'];
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result['categories'];
     }
 
     /**
      * Generiert eine OpenOrder.
      *
      * Die Nutzung ist nur dann möglich, wenn ein Budget nicht deaktiviert worden ist.
-     *
-     * Rückgabe-Array:
-     * budget_order_id – ID der Order (integer)
-     * error [optional bei Fehlern] – die Fehlerbeschreibung (String)
-     * sandbox [im Testmodus] – wenn im Testmodus, ist der Wert 1 (integer)
      *
      * @param int $categoryId Kategorie-ID – kann mit Hilfe von "getCategories()" herausgefunden werden.
      * @param string $title Titel des Auftrags, den die Autoren sehen werden.
@@ -96,18 +95,18 @@ class TextbrokerBudgetOrder extends Textbroker {
      * @param int $maxLength Maximale Wortanzahl.
      * @param int $rating Einstufung – Qualitätsstufe zwischen 2 und 5 (inklusive).
      * @param int $dueDays Bearbeitungszeit [optional] – eine Zahl zwischen 1 und 10 (Tage), wird es nicht angegeben, wird 1 Tag als gewünschter Wert angenommen.
-     * @return array
+     * @return int budget_order_id – ID der Order (integer)
      * @throws TextbrokerBudgetOrderException
      */
     public function create($categoryId, $title, $description, $minLength = 350, $maxLength = 400, $rating = 4, $dueDays = 1) {
 
         $result = $this->getClient()->create($this->salt, $this->hash, $this->budgetKey, $categoryId, $title, $description, $minLength, $maxLength, $rating, $dueDays);
 
-        if (isset($result['error']) && empty($result['error'])) {
+        if (isset($result['error']) && !empty($result['error'])) {
         	throw new TextbrokerBudgetOrderException($result['error']);
         }
 
-        return $result;
+        return $result['budget_order_id'];
     }
 
     /**
@@ -126,7 +125,13 @@ class TextbrokerBudgetOrder extends Textbroker {
      */
     public function getStatus($budgetOrderId) {
 
-        return $this->getClient()->getStatus($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+        $result = $this->getClient()->getStatus($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
     }
 
     /**
@@ -159,23 +164,30 @@ class TextbrokerBudgetOrder extends Textbroker {
      */
     public function pickUp($budgetOrderId) {
 
-        return $this->getClient()->pickUp($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+        $result = $this->getClient()->pickUp($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
     }
 
     /**
      * Löschen von eingestellten Aufträgen vor ihrer Bearbeitung durch Autoren
      *
-     * Rückgabe-Array:
-     * order_id_deleted – ID der gelöschten BudgetOrder (Integer)
-     * sandbox [optional] – wenn die Order im Textmodus betrieben wird = 1 (Integer)
-     * error [optional bei Fehlern] – die Fehlerbeschreibung (String)
-     *
      * @param int $budgetOrderId BudgetOrder-ID – die ID der Order, die abgefragt werden soll. Diese wurde beim Aufruf von "create" im Element "budget_order_id" zurückgegeben.
-     * @return array
+     * @return int order_id_deleted – ID der gelöschten BudgetOrder (Integer)
      */
     public function delete($budgetOrderId) {
 
-        return $this->getClient()->delete($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+        $result = $this->getClient()->delete($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);;
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result['order_id_deleted'];
     }
 
     /**
@@ -199,7 +211,13 @@ class TextbrokerBudgetOrder extends Textbroker {
      */
     public function preview($budgetOrderId) {
 
-        return $this->getClient()->preview($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+        $result = $this->getClient()->preview($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
     }
 
     /**
@@ -229,9 +247,15 @@ class TextbrokerBudgetOrder extends Textbroker {
      * @param string $comment - Nachricht an den Autor – Ein Text mit Begründung der abgegebenen Bewertung (optional)
      * @return array
      */
-    public function accept($budgetOrderId, $rating, $comment = null) {
+    public function accept($budgetOrderId, $rating = 0, $comment = null) {
 
-        return $this->getClient()->accept($this->salt, $this->hash, $this->budgetKey, $budgetOrderId, $rating, $comment);
+        $result = $this->getClient()->accept($this->salt, $this->hash, $this->budgetKey, $budgetOrderId, $rating, $comment);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
     }
 
     /**
@@ -253,7 +277,13 @@ class TextbrokerBudgetOrder extends Textbroker {
      */
     public function revise($budgetOrderId, $comment) {
 
-        return $this->getClient()->revise($this->salt, $this->hash, $this->budgetKey, $budgetOrderId, $comment);
+        $result = $this->getClient()->revise($this->salt, $this->hash, $this->budgetKey, $budgetOrderId, $comment);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
     }
 
     /**
@@ -261,17 +291,18 @@ class TextbrokerBudgetOrder extends Textbroker {
      *
      * Ablehnungen sind nur über diese Funktion möglich. Nur möglich, wenn Auftrag bereits einmal zur Überarbeitung an den Autor geschickt wurde.
      *
-     * Rückgabe-Array:
-     * order_id_rejected – ID der abgelehnten BudgetOrder (Integer)
-     * sandbox [optional] – wenn die Order im Textmodus betrieben wird = 1 (Integer)
-     * error [optional bei Fehlern] – die Fehlerbeschreibung (String)
-     *
      * @param int $budgetOrderId BudgetOrder-ID – die ID der Order, die abgefragt werden soll. Diese wurde beim Aufruf von "create" im Element "budget_order_id" zurückgegeben.
-     * @return array
+     * @return int order_id_rejected – ID der abgelehnten BudgetOrder (Integer)
      */
     public function reject($budgetOrderId) {
 
-        return $this->getClient()->reject($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+        $result = $this->getClient()->reject($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result['order_id_rejected'];
     }
 }
 

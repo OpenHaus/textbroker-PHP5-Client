@@ -11,10 +11,12 @@ You need at least PHP 5.3. A version of PHP>=5.3.2 is recommended.
 You can generate a phpdoc from the code. See the [code examples](http://www.open-haus.de/community/textbroker-php5-client/ "Usage examples on open haus"). Also have a look in the [official textbroker API documentation](http://www.textbroker.com/us/client-api.php "Look for the PDF").
 
 ## Changelog
+
 ### 0.2 
 + Made it possible to decide which server (.de/.com) to use
 + Bugfixes
 + Better exception handling
+
 ### 0.1 
 + Initial release
 

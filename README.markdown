@@ -8,7 +8,15 @@ Copy the files (the directory textbroker-PHP5-Client) somewhere in your executab
 You need at least PHP 5.3. A version of PHP>=5.3.2 is recommended.
 
 ## Documentation
-You can generate a phpdoc from the code. See http://www.open-haus.de/community/textbroker-php5-client/ for code examples. Also have a look in the official textbroker API documentation.
+You can generate a phpdoc from the code. See the [code examples](http://www.open-haus.de/community/textbroker-php5-client/ "Usage examples on open haus"). Also have a look in the [official textbroker API documentation](http://www.textbroker.com/us/client-api.php "Look for the PDF").
+
+## Changelog
+### 0.2 
++ Made it possible to decide which server (.de/.com) to use
++ Bugfixes
++ Better exception handling
+### 0.1 
++ Initial release
 
 ## License
 

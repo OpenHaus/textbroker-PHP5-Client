@@ -247,11 +247,5 @@ class Textbroker {
  *
  *
  */
-class TextbrokerException extends Exception {
-
-    function __construct() {
-
-        parent::__construct();
-    }
-}
+class TextbrokerException extends Exception {}
 ?>

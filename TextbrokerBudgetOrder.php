@@ -306,11 +306,5 @@ class TextbrokerBudgetOrder extends Textbroker {
     }
 }
 
-class TextbrokerBudgetOrderException extends TextbrokerException {
-
-    function __construct() {
-
-        parent::__construct();
-    }
-}
+class TextbrokerBudgetOrderException extends TextbrokerException {}
 ?>

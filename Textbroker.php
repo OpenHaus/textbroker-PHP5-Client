@@ -55,7 +55,9 @@
  */
 class Textbroker {
 
-    const BUDGET_URI                    = 'https://api.textbroker.de/Budget/';
+    const BUDGET_URI_GERMANY            = 'https://api.textbroker.de/Budget/';
+    const BUDGET_URI_USA                = 'https://api.textbroker.com/Budget/';
+    const BUDGET_LOCATION_DEFAULT       = 'us'; # or 'de' ATM
     const BUDGET_ID                     = 0; # Set this or pass in constructor
     const BUDGET_KEY                    = ''; # Set this or pass in constructor
     const PASSWORD                      = ''; # Set this or pass in constructor
@@ -129,6 +131,7 @@ class Textbroker {
      */
     const TB_STATUS_WAITING             = 10;
 
+    private $location;
     private $aOptions;
 
     protected $budgetId;
@@ -144,7 +147,7 @@ class Textbroker {
      * @param int $budgetId Budget ID as shown in "Budget Login information" in textbroker API backend
      * @param string $password Password as defined in textbroker API backend
      */
-    function __construct($budgetKey = null, $budgetId = null, $password = null) {
+    function __construct($budgetKey = null, $budgetId = null, $password = null, $location = self::BUDGET_LOCATION_DEFAULT) {
 
         if (!is_null($budgetKey)) {
             $this->budgetKey    = $budgetKey;
@@ -162,8 +165,9 @@ class Textbroker {
             $password           = self::PASSWORD;
         }
 
-        $this->salt = rand(0, 10000);
-        $this->hash = md5($this->salt . $password);
+        $this->location = $location;
+        $this->salt     = rand(0, 10000);
+        $this->hash     = md5($this->salt . $password);
         $this->login();
     }
 
@@ -172,13 +176,13 @@ class Textbroker {
      *
      * @return object
      */
-    public static function &singleton($budgetKey = null, $budgetId = null, $password = null) {
+    public static function &singleton($budgetKey = null, $budgetId = null, $password = null, $location = self::BUDGET_LOCATION_DEFAULT) {
 
         static $instance;
 
         if (!isset($instance)) {
             $class      = get_called_class();
-            $instance   = new $class($budgetKey, $budgetId, $password);
+            $instance   = new $class($budgetKey, $budgetId, $password, $location);
         }
 
         return $instance;
@@ -191,13 +195,15 @@ class Textbroker {
      */
     private function login() {
 
-        $this->setOptions(array(
-            'location'      => 'https://api.textbroker.de/Budget/loginService.php',
-            'uri'           => self::BUDGET_URI,
-        ));
+        $this->setOptions(
+            array(
+                'location'      => $this->getUri() . 'loginService.php',
+                'uri'           => $this->getUri(),
+            )
+        );
 
         if (!$this->getClient()->doLogin($this->salt, $this->hash, $this->budgetKey)) {
-            throw new Exception('Could not login');
+            throw new TextbrokerException('Could not login');
         }
     }
 
@@ -221,8 +227,26 @@ class Textbroker {
 
         $this->aOptions = $aOptions;
     }
+
+    /**
+     * Get the correct uri depending on location
+     *
+     * @return string
+     */
+    protected function getUri() {
+
+        if ($this->location == 'de') {
+        	return self::BUDGET_URI_GERMANY;
+        } else {
+        	return self::BUDGET_URI_USA;
+        }
+    }
 }
 
+/**
+ *
+ *
+ */
 class TextbrokerException extends Exception {
 
     function __construct() {

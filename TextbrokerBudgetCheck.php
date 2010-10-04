@@ -48,12 +48,19 @@ require_once(dirname(__FILE__) . '/Textbroker.php');
  */
 class TextbrokerBudgetCheck extends Textbroker {
 
-    function __construct($budgetKey = null, $budgetId = null, $password = null) {
+    /**
+     *
+     *
+     * @param string $budgetKey
+     * @param int $budgetId
+     * @param string $password
+     */
+    function __construct($budgetKey = null, $budgetId = null, $password = null, $location = 'us') {
 
-        parent::__construct($budgetKey, $budgetId, $password);
+        parent::__construct($budgetKey, $budgetId, $password, $location);
         $this->setOptions(array(
-            'location'      => 'https://api.textbroker.de/Budget/budgetCheckService.php',
-            'uri'           => self::BUDGET_URI,
+            'location'      => $this->getUri() . 'budgetCheckService.php',
+            'uri'           => $this->getUri(),
         ));
     }
 
@@ -90,7 +97,9 @@ class TextbrokerBudgetCheck extends Textbroker {
      */
     public function getName() {
 
-        return $this->getClient()->getName($this->salt, $this->hash, $this->budgetKey);
+        $result = $this->getClient()->getName($this->salt, $this->hash, $this->budgetKey);
+
+        return $result['name'];
     }
 
     /**

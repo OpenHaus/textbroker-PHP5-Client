@@ -54,12 +54,12 @@ class TextbrokerBudgetOrder extends Textbroker {
      * @param string $budgetKey
      * @param string $budgetId
      */
-    function __construct($budgetKey = null, $budgetId = null, $password = null) {
+    function __construct($budgetKey = null, $budgetId = null, $password = null, $location = 'us') {
 
-        parent::__construct($budgetKey, $budgetId, $password);
+        parent::__construct($budgetKey, $budgetId, $password, $location);
         $this->setOptions(array(
-            'location'      => 'https://api.textbroker.de/Budget/budgetOrderService.php',
-            'uri'           => self::BUDGET_URI,
+            'location'      => $this->getUri() . 'budgetOrderService.php',
+            'uri'           => $this->getUri(),
         ));
     }
 

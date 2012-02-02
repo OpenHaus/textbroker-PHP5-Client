@@ -1,6 +1,6 @@
 <?php
 // +---------------------------------------------------------------------------+
-// | Copyright (c) 2010, Fabio Bacigalupo                                      |
+// | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
 // |                                                                           |
 // | Redistribution and use in source and binary forms, with or without        |
@@ -29,9 +29,9 @@
 // | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.      |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-// | textbroker-PHP5-Client 0.1                                                |
+// | textbroker-PHP5-Client 1.0                                                |
 // +---------------------------------------------------------------------------+
-// | TextbrokerBudgetOrderChangeDAO.php                                        |
+// | TextbrokerBudgetOrderChange.php                                           |
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
@@ -53,6 +53,23 @@ require_once(dirname(__FILE__) . '/Textbroker.php');
  * @author Fabio Bacigalupo <info1@open-haus.de>
  */
 class TextbrokerBudgetOrderChange extends Textbroker {
+
+    /**
+     * Singleton
+     *
+     * @return object
+     */
+    public static function &singleton($budgetKey = null, $budgetId = null, $password = null, $location = self::BUDGET_LOCATION_DEFAULT) {
+
+        static $instance;
+
+        if (!isset($instance)) {
+            $class      = __CLASS__;
+            $instance   = new $class($budgetKey, $budgetId, $password, $location);
+        }
+
+        return $instance;
+    }
 
     /**
      *
@@ -100,6 +117,39 @@ class TextbrokerBudgetOrderChange extends Textbroker {
     public function changeWordsCount($budgetOrderId, $minLength, $maxLength) {
 
         return $this->getClient()->changeWordsCount($this->salt, $this->hash, $this->budgetKey, $budgetOrderId, $minLength, $maxLength);
+    }
+
+    /**
+     * Setzt die gewünschten Schlüsselworte mit oder ohne minimal- und maximal-Wert für deren Häufigkeit im Text
+     *
+     * Rückgabe-Array:
+     * order_id_changed - im Erfolgsfall die ID des geänderten Auftrags
+     * warning [optional bei unzulässigen Zeichen in Keywords] – Eine Beschreibung, welche Keywords verändert worden sind und wie sie bei uns abgespeichert werden. Beispiel: ››This keyword(s) “FF/Z5, Oh!, 66€, $_[key]” was changed to “FF Z5, Oh, 66, key”‹‹ (String)
+     * error [optional bei Fehlern] – die Fehlerbeschreibung (String)
+     *
+     * @param int $orderId
+     * @param string $keywords – (UTF-8-kodierte) Liste der zu verwendeten Begriffe, separiert mit Komma oder Semikolon (Leerzeichen beim Separator sind erlaubt). Es gelten die gleichen Bedingungen wie im Web-Interface: Zulässig sind nur Buchstaben (aus gleichen Bedingungen wie im Web-Interface: Zulässig sind nur Buchstaben (aus UTF-8-Bereich) und Zahlen, Leerzeichen, „&“, „„“ (Apostroph), „-“ (Minus), „%“ und „.“ (Punkt). Sollten nicht zulässige Zeichen verwendet worden sein, werden diese durch Leerzeichen ersetzt und eine Warnung wird zurückgegeben. (String)
+     * @param int $min – [optional, wenn eine Keyworddichte erwartet wird] die kleinste geforderte Häufigkeit jedes der Keywords im Text (Natürliche Zahl).
+     * @param int $max – [optional, wenn eine Keyworddichte erwartet wird] die höchste geforderte Häufigkeit jedes der Keywords im Text (Natürliche Zahl).
+     * @return array
+     */
+    public function setSEO($orderId, $keys, $min = null, $max = null, $useInflections = 0, $useStopwords = 0) {
+
+        $result = $this->getClient()->setSEO($this->salt, $this->hash, $this->budgetKey, $orderId, $keys, $min, $max, $useInflections, $useStopwords);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderChangeException($result['error']);
+        }
+
+        return $result;
+    }
+}
+
+class TextbrokerBudgetOrderChangeException extends TextbrokerException {
+
+    public function __construct($message, $code = 0) {
+
+        parent::__construct($message, $code);
     }
 }
 ?>

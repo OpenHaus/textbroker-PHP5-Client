@@ -1,27 +1,47 @@
 # textbroker-PHP5-Client
-PHP5 Wrapper for the textbroker API
+PHP5 Wrapper for the Textbroker API
 
 ## Installation
-Copy the files (the directory textbroker-PHP5-Client) somewhere in your executable path.
+Copy the files (the directory textbroker-PHP5-Client) somewhere in your executable path or include the path at runtime.
 
 ## Requirements
-You need at least PHP 5.3. A version of PHP>=5.3.2 is recommended.
+You need at least PHP 5.2. A version of PHP>=5.3.2 is recommended.
 
 ## Documentation
 You can generate a phpdoc from the code. See the [code examples](http://www.open-haus.de/community/textbroker-php5-client/ "Usage examples on open haus"). Also have a look in the [official textbroker API documentation](http://www.textbroker.com/us/client-api.php "Look for the PDF").
 
 ## Changelog
-### 0.2 
-+ Made it possible to decide which server (.de/.com) to use
+
+### 1.0
++ Added TextbrokerBudgetOrder::getCopyscapeResults function
++ Added TextbrokerBudgetOrder::getTeams function
++ Added TextbrokerBudgetOrder::getCostsTeamOrder function
++ Added TextbrokerBudgetOrder::createTeamOrder function
++ Added TextbrokerBudgetOrder::getOrdersByStatus function
++ Added TextbrokerBudgetOrderChange::setSEO function
++ Added TextbrokerBudgetProofreading class
++ Added TextbrokerBudgetProofreading::create function
++ Added TextbrokerBudgetProofreading::getCosts function
++ Added TextbrokerBudgetProofreading::preview function
++ Added TextbrokerBudgetProofreading::accept function
++ Added TextbrokerBudgetProofreading::getStatus function
++ Added TextbrokerBudgetProofreading::delete function
++ Added TextbrokerBudgetProofreading::pickUp function
++ Added TextbrokerBudgetProofreading::revise function
++ Added TextbrokerBudgetProofreading::reject function
+
+### 0.2
++ Made it possible to decide which server (.de/.com/.fr/etc.) to use
 + Bugfixes
 + Better exception handling
-### 0.1 
+
+### 0.1
 + Initial release
 
 ## License
 
 	+---------------------------------------------------------------------------+
-	| Copyright (c) 2010, Fabio Bacigalupo, open haus                           |
+	| Copyright (c) 2012, Fabio Bacigalupo, open haus                           |
 	| All rights reserved.                                                      |
 	|                                                                           |
 	| Redistribution and use in source and binary forms, with or without        |

@@ -1,6 +1,6 @@
 <?php
 // +---------------------------------------------------------------------------+
-// | Copyright (c) 2010, Fabio Bacigalupo                                      |
+// | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
 // |                                                                           |
 // | Redistribution and use in source and binary forms, with or without        |
@@ -29,9 +29,9 @@
 // | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.      |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-// | textbroker-PHP5-Client 0.1                                                |
+// | textbroker-PHP5-Client 1.0                                                |
 // +---------------------------------------------------------------------------+
-// | TextbrokerBudgetCheckDAO.php                                              |
+// | TextbrokerBudgetCheck.php                                                 |
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
@@ -47,6 +47,23 @@ require_once(dirname(__FILE__) . '/Textbroker.php');
  * @author Fabio Bacigalupo <info1@open-haus.de>
  */
 class TextbrokerBudgetCheck extends Textbroker {
+
+    /**
+     * Singleton
+     *
+     * @return object
+     */
+    public static function &singleton($budgetKey = null, $budgetId = null, $password = null, $location = self::BUDGET_LOCATION_DEFAULT) {
+
+        static $instance;
+
+        if (!isset($instance)) {
+            $class      = __CLASS__;
+            $instance   = new $class($budgetKey, $budgetId, $password, $location);
+        }
+
+        return $instance;
+    }
 
     /**
      *

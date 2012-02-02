@@ -1,6 +1,6 @@
 <?php
 // +---------------------------------------------------------------------------+
-// | Copyright (c) 2010, Fabio Bacigalupo                                      |
+// | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
 // |                                                                           |
 // | Redistribution and use in source and binary forms, with or without        |
@@ -29,9 +29,9 @@
 // | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.      |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-// | textbroker-PHP5-Client 0.1                                                |
+// | textbroker-PHP5-Client 1.0                                                |
 // +---------------------------------------------------------------------------+
-// | TextbrokerBudgetOrderDAO.php                                              |
+// | TextbrokerBudgetOrder.php                                                 |
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
@@ -49,10 +49,29 @@ require_once(dirname(__FILE__) . '/Textbroker.php');
 class TextbrokerBudgetOrder extends Textbroker {
 
     /**
+     * Singleton
+     *
+     * @return object
+     */
+    public static function &singleton($budgetKey, $budgetId, $password, $location = self::BUDGET_LOCATION_DEFAULT) {
+
+        static $instance;
+
+        if (!isset($instance[$budgetKey])) {
+            $class                  = __CLASS__;
+            $instance[$budgetKey]   = new $class($budgetKey, $budgetId, $password, $location);
+        }
+
+        return $instance[$budgetKey];
+    }
+
+    /**
      *
      *
      * @param string $budgetKey
      * @param string $budgetId
+     * @param string $password
+     * @param string $location
      */
     function __construct($budgetKey = null, $budgetId = null, $password = null, $location = 'us') {
 
@@ -126,6 +145,27 @@ class TextbrokerBudgetOrder extends Textbroker {
     public function getStatus($budgetOrderId) {
 
         $result = $this->getClient()->getStatus($this->salt, $this->hash, $this->budgetKey, $budgetOrderId);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Auflisten von Aufträgen, die den angegebenen Zustand haben
+     *
+     * Rückgabe-Array:
+     * ein Array aller Budget-Order-IDs, die den Status erreicht haben. (Kann leer sein)
+     *
+     * @param int $status – numerischer Wert, der den abzufragenden Status identifiziert wie ACCEPTED = 5
+     * @return array
+     * @throws TextbrokerBudgetOrderException
+     */
+    public function getOrdersByStatus($status) {
+
+        $result = $this->getClient()->getOrdersByStatus($this->salt, $this->hash, $this->budgetKey, $status);
 
         if (isset($result['error']) && !empty($result['error'])) {
         	throw new TextbrokerBudgetOrderException($result['error']);
@@ -221,6 +261,31 @@ class TextbrokerBudgetOrder extends Textbroker {
     }
 
     /**
+     * Automatischer Abgleich des bearbeiteten Texts mit Datenbank zum Ausschluss von Plagiaten mit CopyScape
+     *
+     * Rückgabe-Array:
+     * answer ['response_code'] - int - 0 = not available, 1 = no match has been found, 2 = matches have been found
+     * answer ['response_text'] - string - not available, no match has been found, matches have been found
+     * answer ['checked'] - Zeitstempel - Zzeitpunkt der Prüfung
+     * answer ['results_count'] - int - Anzahl der Ergebnisse
+     * answer ['copyscape_results'] - empty Array oder assoziatives Array
+     *
+     * @param int $budgetOrderId BudgetOrder-ID – die ID der Order, die abgefragt werden soll. Diese wurde beim Aufruf von "create" im Element "budget_order_id" zurückgegeben.
+     * @param mixed $sandboxResponseCode (Optional - Nur in Sandbox-Mode verfügbar) int 0-2 : Es können alle 3 Fallbeispiele simuliert werden.
+     * @return array
+     */
+    public function getCopyscapeResults($budgetOrderId, $sandboxResponseCode = null) {
+
+        $result = $this->getClient()->getCopyscapeResults($this->salt, $this->hash, $this->budgetKey, $budgetOrderId, $sandboxResponseCode);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
+    }
+
+    /**
      * Akzeptieren von fertiggestellten Orders
      *
      * Bewertung – ein Integer zwischen 0 und 4, um zu akzeptieren.
@@ -304,7 +369,126 @@ class TextbrokerBudgetOrder extends Textbroker {
 
         return $result['order_id_rejected'];
     }
+
+    /**
+     *
+     * Rückgabe-Array:
+     * $answer['classification'] - Übermittelte Einstufung
+     * $answer['word_count'] - Übermittelte Anzahl der Wörter
+     * $answer['cost_per_word'] - Kosten pro Wort in der jeweiligen Einstufung
+     * $answer['cost_order'] - Kosten für die Order
+     * $answer['cost_order_fee'] - Bearbeitungsdgebuer
+     * $answer['cost_total'] - Gesamtkosten für den Auftrag
+     * $answer['currency'] - Jeweilige Währung
+     *
+     * @param int $wordCount
+     * @param int $classification
+     * @return array
+     */
+    public function getCosts($wordCount, $classification) {
+
+        $result = $this->getClient()->getCosts($this->salt, $this->hash, $this->budgetKey, $wordCount, $classification);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Auswahl von zuvor eingestellten Expertenteams
+     *
+     * Bevor eine Abfrage möglich ist, muss im Textbroker Kundenaccount mindestens ein Team angelegt sein.
+     *
+     * Zurückgegeben wird ein Zweidimensionales-Array:
+     * team_id - die Team ID (Integer)
+     * category_id - die Kategorie ID (Integer)
+     * team_name - der Name des Teams (String)
+     * team_description - die Beschreibung zu dem Team (String)
+     * team_price_per_word - der angegebene Preis pro Wort (Float)
+     * team_order_fee - die Textbroker Bearbeitungsgebühren
+     * team_bonus_per_article [optional] = Bonus pro Artikel (Float)
+     * team_public – die Angabe, ob das Team öffentlich ist oder nicht: 1 = öffentlich; 0 = nicht öffentlich, Einladung erforderlich
+     * team_status – der Teamstatus: 1 = aktiv; 0 = inaktiv (Integer)
+     * time_created – Erstellungsdatum des Teams: Unix Zeitstempel (Integer)
+     *
+     * @return array
+     */
+    public function getTeams() {
+
+        $result = $this->getClient()->getTeams($this->salt, $this->hash, $this->budgetKey);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Abfrage der Kosten für eine TeamOrder
+     *
+     * Bevor eine Abfrage möglich ist, muss im Textbroker Kundenaccount mindestens ein Team angelegt sein.
+     *
+     * Rückgabe:
+     * classification = 'TeamOrder' (String)
+     * team_id - die Team ID (Integer)
+     * word_count - die Anzahl der übermittelten Worte (Integer)
+     * cost_per_word - die Kosten für den Auftrag ohne Bearbeitungsgebühr (Float)
+     * cost_order - die Kosten pro Wort (Float)
+     * cost_order_fee - die TB Bearbeitungsgebühr (Float)
+     * cost_total - die Gesamtkosten für den Auftrag inkl. Bearbeitungsgebühr (Float)
+     * currency - die Währung (String)
+     *
+     * @param int $teamId die Team ID (Integer)
+     * @param int $wordCount
+     * @return array
+     */
+    public function getCostsTeamOrder($teamId, $wordCount) {
+
+        $result = $this->getClient()->getCostsTeamOrder($this->salt, $this->hash, $this->budgetKey, $teamId, $wordCount);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Erstellt eine TeamOrder
+     *
+     * Rückgabe:
+     * budget_order_id - (Integer) die Order ID der TeamOrder, wenn erfolgreich ansonsten
+     * error - ein Fehler mit Fehlermeldung (String)
+     *
+     * @param int $teamId - die Team ID (Integer)
+     * @param string $orderTitle - Titel des Auftrags, den die Autoren sehen werden.
+     * @param string $orderDescription - Genauere Beschreibung des Auftrags
+     * @param int $wordsMin - Minimale Wortanzahl
+     * @param int $wordsMax - Maximale Wortanzahl
+     * @param int $workingTime -  eine Zahl zwischen 1 und 10 (Tagen)
+     * @param string $note [optional] - wenn Sie eine Notiz für sich selbst hinterlassen wollen, die Sie beim pickUp angezeigt bekommen, müssen Sie als weitere zwei Parameter zunächst eine 0 und dann die Notiz übergeben.
+     * @return array
+     */
+    public function createTeamOrder($teamId, $orderTitle, $orderDescription, $wordsMin, $wordsMax, $workingTime, $note = null) {
+
+        $result = $this->getClient()->createTeamOrder($this->salt, $this->hash, $this->budgetKey, $teamId, $orderTitle, $orderDescription, $wordsMin, $wordsMax, $workingTime, $note);
+
+        if (isset($result['error']) && !empty($result['error'])) {
+        	throw new TextbrokerBudgetOrderException($result['error']);
+        }
+
+        return $result['budget_order_id'];
+    }
 }
 
-class TextbrokerBudgetOrderException extends TextbrokerException {}
+class TextbrokerBudgetOrderException extends TextbrokerException {
+
+    public function __construct($message, $code = 0) {
+
+        parent::__construct($message, $code);
+    }
+}
 ?>

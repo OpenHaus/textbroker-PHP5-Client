@@ -1,6 +1,6 @@
 <?php
 // +---------------------------------------------------------------------------+
-// | Copyright (c) 2010, Fabio Bacigalupo                                      |
+// | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
 // |                                                                           |
 // | Redistribution and use in source and binary forms, with or without        |
@@ -29,9 +29,9 @@
 // | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.      |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-// | textbroker-PHP5-Client 0.1                                                |
+// | textbroker-PHP5-Client 1.0                                                |
 // +---------------------------------------------------------------------------+
-// | TextbrokerDAO.php                                                         |
+// | Textbroker.php                                                            |
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
@@ -43,20 +43,24 @@
  *
  * Usage:
  * <code>
- * require_once 'TextbrokerBudgetOrderDAO.php';
- * $budgetOrder = TextbrokerBudgetOrderDAO::singleton();
+ * require_once 'TextbrokerBudgetOrder.php';
+ * $budgetOrder = TextbrokerBudgetOrder::singleton($budgetKey, $budgetId, $password);
  * $aCategories = $budgetOrder->getCategories();
  * $aStatus     = $budgetOrder->getStatus($budgetOrderId);
  * </code>
  *
  * @package textbroker-PHP5-Client
  * @author Fabio Bacigalupo <info1@open-haus.de>
- * @since PHP 5.3
+ * @since PHP5.2.10
  */
 class Textbroker {
 
     const BUDGET_URI_GERMANY            = 'https://api.textbroker.de/Budget/';
     const BUDGET_URI_USA                = 'https://api.textbroker.com/Budget/';
+    const BUDGET_URI_FRANCE             = 'https://api.textbroker.fr/Budget/';
+    const BUDGET_URI_UK                 = 'https://api.textbroker.co.uk/Budget/';
+    const BUDGET_URI_NL                 = 'https://api.textbroker.nl/Budget/';
+    const BUDGET_URI_ES                 = 'https://api.textbroker.es/Budget/';
     const BUDGET_LOCATION_DEFAULT       = 'us'; # or 'de' ATM
     const BUDGET_ID                     = 0; # Set this or pass in constructor
     const BUDGET_KEY                    = ''; # Set this or pass in constructor
@@ -138,6 +142,14 @@ class Textbroker {
     protected $budgetKey;
     protected $salt;
     protected $hash;
+    protected static $aLocations        = array(
+        'de'        => self::BUDGET_URI_GERMANY,
+        'us'        => self::BUDGET_URI_USA,
+        'fr'        => self::BUDGET_URI_FRANCE,
+        'en'        => self::BUDGET_URI_UK,
+        'nl'        => self::BUDGET_URI_NL,
+        'es'        => self::BUDGET_URI_ES,
+    );
 
     /**
      * If you use multiple budgets you want to pass settings in constructor
@@ -181,7 +193,7 @@ class Textbroker {
         static $instance;
 
         if (!isset($instance)) {
-            $class      = get_called_class();
+            $class      = __CLASS__;
             $instance   = new $class($budgetKey, $budgetId, $password, $location);
         }
 
@@ -189,7 +201,7 @@ class Textbroker {
     }
 
     /**
-     * Login to textbroker service
+     * Login to Textbroker service
      *
      * @throws Exception
      */
@@ -235,17 +247,23 @@ class Textbroker {
      */
     protected function getUri() {
 
-        if ($this->location == 'de') {
-        	return self::BUDGET_URI_GERMANY;
-        } else {
-        	return self::BUDGET_URI_USA;
+        if (array_key_exists($this->location, self::$aLocations)) {
+            return self::$aLocations[$this->location];
         }
+
+        return $this->location;
     }
 }
 
 /**
- *
+ * Custom exception
  *
  */
-class TextbrokerException extends Exception {}
+class TextbrokerException extends Exception {
+
+    public function __construct($message, $code = 0) {
+
+        parent::__construct($message, $code);
+    }
+}
 ?>

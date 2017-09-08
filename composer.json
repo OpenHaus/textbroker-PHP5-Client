@@ -10,7 +10,7 @@
   },
   "require": {
     "php": ">=5.6",
-    "ext-soap": ">=7.15.0"
+    "ext-soap": ">=7.1.5"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7",

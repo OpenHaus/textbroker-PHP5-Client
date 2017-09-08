@@ -1,4 +1,6 @@
 <?php
+namespace Softonic\Textbroker;
+
 // +---------------------------------------------------------------------------+
 // | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
@@ -35,8 +37,6 @@
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
-
-require_once(dirname(__FILE__) . '/Textbroker.php');
 
 /**
  * BudgetCheckService
@@ -143,4 +143,3 @@ class TextbrokerBudgetCheck extends Textbroker {
         return $this->getClient()->getActualPeriodData($this->salt, $this->hash, $this->budgetKey);
     }
 }
-?>

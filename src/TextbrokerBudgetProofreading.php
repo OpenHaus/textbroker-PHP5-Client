@@ -1,4 +1,6 @@
 <?php
+namespace Softonic\Textbroker;
+
 // +---------------------------------------------------------------------------+
 // | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
@@ -35,8 +37,6 @@
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
-
-require_once(dirname(__FILE__) . '/Textbroker.php');
 
 /**
  * BudgetProofreadingService
@@ -303,12 +303,3 @@ class TextbrokerBudgetProofreading extends Textbroker {
         return $result['proofreading_id_rejected'];
     }
 }
-
-class TextbrokerBudgetProofreadingException extends TextbrokerException {
-
-    public function __construct($message, $code = 0) {
-
-        parent::__construct($message, $code);
-    }
-}
-?>

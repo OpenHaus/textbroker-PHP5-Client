@@ -1,4 +1,6 @@
 <?php
+namespace Softonic\Textbroker;
+
 // +---------------------------------------------------------------------------+
 // | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
@@ -35,8 +37,6 @@
 // +---------------------------------------------------------------------------+
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
-
-require_once(dirname(__FILE__) . '/Textbroker.php');
 
 /**
  * BudgetOrderChangeService
@@ -144,12 +144,3 @@ class TextbrokerBudgetOrderChange extends Textbroker {
         return $result;
     }
 }
-
-class TextbrokerBudgetOrderChangeException extends TextbrokerException {
-
-    public function __construct($message, $code = 0) {
-
-        parent::__construct($message, $code);
-    }
-}
-?>

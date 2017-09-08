@@ -1,4 +1,7 @@
 <?php
+
+namespace Softonic\Textbroker;
+
 // +---------------------------------------------------------------------------+
 // | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
@@ -227,7 +230,7 @@ class Textbroker {
      */
     protected function getClient() {
 
-        return new SoapClient(null, $this->aOptions);
+        return new \SoapClient(null, $this->aOptions);
     }
 
     /**
@@ -254,16 +257,3 @@ class Textbroker {
         return $this->location;
     }
 }
-
-/**
- * Custom exception
- *
- */
-class TextbrokerException extends Exception {
-
-    public function __construct($message, $code = 0) {
-
-        parent::__construct($message, $code);
-    }
-}
-?>

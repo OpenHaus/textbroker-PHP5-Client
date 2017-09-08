@@ -53,7 +53,7 @@ class TextbrokerBudgetOrder extends Textbroker {
      *
      * @return object
      */
-    public static function &singleton($budgetKey, $budgetId, $password, $location = self::BUDGET_LOCATION_DEFAULT) {
+    public static function &singleton($budgetKey = null, $budgetId = null, $password = null, $location = self::BUDGET_LOCATION_DEFAULT) {
 
         static $instance;
 

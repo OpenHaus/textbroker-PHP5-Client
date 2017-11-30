@@ -58,13 +58,17 @@ namespace Softonic\Textbroker;
  */
 class Textbroker {
 
+    const BUDGET_URI_BRAZIL             = 'https://api.textbroker.com.br/Budget/';
     const BUDGET_URI_GERMANY            = 'https://api.textbroker.de/Budget/';
-    const BUDGET_URI_USA                = 'https://api.textbroker.com/Budget/';
+    const BUDGET_URI_SPAIN              = 'https://api.textbroker.es/Budget/';
     const BUDGET_URI_FRANCE             = 'https://api.textbroker.fr/Budget/';
-    const BUDGET_URI_UK                 = 'https://api.textbroker.co.uk/Budget/';
-    const BUDGET_URI_NL                 = 'https://api.textbroker.nl/Budget/';
-    const BUDGET_URI_ES                 = 'https://api.textbroker.es/Budget/';
-    const BUDGET_LOCATION_DEFAULT       = 'us'; # or 'de' ATM
+    const BUDGET_URI_ITALY              = 'https://api.textbroker.it/Budget/';
+    const BUDGET_URI_NETHERLANDS        = 'https://api.textbroker.nl/Budget/';
+    const BUDGET_URI_POLAND             = 'https://api.textbroker.pl/Budget/';
+    const BUDGET_URI_PORTUGAL           = 'https://api.textbroker.pt/Budget/';
+    const BUDGET_URI_UNITED_KINGDOM     = 'https://api.textbroker.co.uk/Budget/';
+    const BUDGET_URI_USA                = 'https://api.textbroker.com/Budget/';
+    const BUDGET_LOCATION_DEFAULT       = 'en';
     const BUDGET_ID                     = 0; # Set this or pass in constructor
     const BUDGET_KEY                    = ''; # Set this or pass in constructor
     const PASSWORD                      = ''; # Set this or pass in constructor
@@ -146,12 +150,16 @@ class Textbroker {
     protected $salt;
     protected $hash;
     protected static $aLocations        = array(
+        'br'        => self::BUDGET_URI_BRAZIL,
         'de'        => self::BUDGET_URI_GERMANY,
-        'us'        => self::BUDGET_URI_USA,
+        'es'        => self::BUDGET_URI_SPAIN,
         'fr'        => self::BUDGET_URI_FRANCE,
-        'en'        => self::BUDGET_URI_UK,
-        'nl'        => self::BUDGET_URI_NL,
-        'es'        => self::BUDGET_URI_ES,
+        'it'        => self::BUDGET_URI_ITALY,
+        'nl'        => self::BUDGET_URI_NETHERLANDS,
+        'pl'        => self::BUDGET_URI_POLAND,
+        'pt'        => self::BUDGET_URI_PORTUGAL,
+        'en'        => self::BUDGET_URI_UNITED_KINGDOM,
+        'us'        => self::BUDGET_URI_USA,
     );
 
     /**

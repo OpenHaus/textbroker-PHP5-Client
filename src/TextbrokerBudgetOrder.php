@@ -1,4 +1,6 @@
 <?php
+namespace Softonic\Textbroker;
+
 // +---------------------------------------------------------------------------+
 // | Copyright (c) 2012, Fabio Bacigalupo                                      |
 // | All rights reserved.                                                      |
@@ -36,8 +38,6 @@
 // | Authors: Fabio Bacigalupo <info1@open-haus.de>                            |
 // +---------------------------------------------------------------------------+
 
-require_once(dirname(__FILE__) . '/Textbroker.php');
-
 /**
  * BudgetOrderService
  *
@@ -53,7 +53,7 @@ class TextbrokerBudgetOrder extends Textbroker {
      *
      * @return object
      */
-    public static function &singleton($budgetKey, $budgetId, $password, $location = self::BUDGET_LOCATION_DEFAULT) {
+    public static function &singleton($budgetKey = null, $budgetId = null, $password = null, $location = self::BUDGET_LOCATION_DEFAULT) {
 
         static $instance;
 
@@ -483,12 +483,3 @@ class TextbrokerBudgetOrder extends Textbroker {
         return $result['budget_order_id'];
     }
 }
-
-class TextbrokerBudgetOrderException extends TextbrokerException {
-
-    public function __construct($message, $code = 0) {
-
-        parent::__construct($message, $code);
-    }
-}
-?>

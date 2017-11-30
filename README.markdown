@@ -1,16 +1,19 @@
-# textbroker-PHP5-Client
-PHP5 Wrapper for the Textbroker API
+# textbroker-php-client
+PHP5 Wrapper for the Textbroker API with composer support and namespaces. Original repo [here](https://github.com/OpenHaus/textbroker-PHP5-Client)
 
 ## Installation
 Copy the files (the directory textbroker-PHP5-Client) somewhere in your executable path or include the path at runtime.
 
 ## Requirements
-You need at least PHP 5.2. A version of PHP>=5.3.2 is recommended.
+You need at least PHP 5.2. A version of PHP>=5.6 is recommended.
 
 ## Documentation
 You can generate a phpdoc from the code. See the [code examples](http://www.open-haus.de/community/textbroker-php5-client/ "Usage examples on open haus"). Also have a look in the [official textbroker API documentation](http://www.textbroker.com/us/client-api.php "Look for the PDF").
 
 ## Changelog
+
+### 1.1
++ Added support for composer and namespaces
 
 ### 1.0
 + Added TextbrokerBudgetOrder::getCopyscapeResults function
